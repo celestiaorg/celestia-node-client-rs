@@ -8,7 +8,7 @@ pub use serde::{Deserialize, Serialize};
 
 pub const DEFAULT_BASE_URL: &str = "http://localhost:26658";
 
-pub const ENDPOINT_BALANCE: &str = "/balance";
+pub const ENDPOINT_BALANCE: &str = "balance";
 
 /// Celestia client context. Keeps track of a REST client against a base URL.
 pub struct Context {
@@ -16,7 +16,7 @@ pub struct Context {
     client: reqwest::Client,
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct BalanceResponse {
     denom: String,
     amount: u64,
@@ -47,5 +47,19 @@ impl Context {
     pub async fn balance(&self) -> Result<BalanceResponse, Error> {
         let response: BalanceResponse = self.call(ENDPOINT_BALANCE).await?;
         Ok(response)
+    }
+}
+
+/// Tests for client. Note that you need to be running a Celestia node at
+/// `DEFAULT_BASE_URL`.
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn balance() {
+        let context = Context::new(DEFAULT_BASE_URL);
+        let balance_response = context.balance().await.unwrap();
+        print!("{} response: {:?}", ENDPOINT_BALANCE, balance_response);
     }
 }
