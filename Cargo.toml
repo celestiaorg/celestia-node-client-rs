@@ -9,3 +9,5 @@ repository = "https://github.com/adlerjohn/celestia-node-client-rs"
 description = "🦀 celestia-node REST client in Rust."
 
 [dependencies]
+reqwest = "0.11"
+serde = "1.0"
