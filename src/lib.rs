@@ -48,10 +48,16 @@ pub struct HeaderResponse {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct NamespacedDataResponse {}
+pub struct NamespacedDataResponse {
+    data: Vec<String>,
+    height: u32,
+}
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct NamespacedSharesResponse {}
+pub struct NamespacedSharesResponse {
+    shares: Option<Vec<String>>,
+    height: u32,
+}
 
 impl Context {
     async fn call<T: for<'de> Deserialize<'de>>(
