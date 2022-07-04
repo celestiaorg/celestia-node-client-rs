@@ -258,7 +258,7 @@ mod tests {
             .namespaced_shares("0123456789abcdef".to_string(), None)
             .await
             .unwrap();
-        println!("{} response: {:?}", ENDPOINT_NAMESPACED_DATA, response);
+        println!("{} response: {:?}", ENDPOINT_NAMESPACED_SHARES, response);
     }
 
     #[tokio::test]
@@ -268,6 +268,6 @@ mod tests {
             .namespaced_shares("0123456789abcdef".to_string(), Some(1))
             .await
             .unwrap();
-        println!("{} response: {:?}", ENDPOINT_NAMESPACED_DATA, response);
+        println!("{} response: {:?}", ENDPOINT_NAMESPACED_SHARES, response);
     }
 }
