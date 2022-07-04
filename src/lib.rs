@@ -12,6 +12,7 @@ pub use types::*;
 pub const DEFAULT_BASE_URL: &str = "http://localhost:26658";
 
 const ENDPOINT_BALANCE: &str = "balance";
+const ENDPOINT_DATA_AVAILABLE: &str = "data_available";
 const ENDPOINT_HEAD: &str = "head";
 const ENDPOINT_HEADER: &str = "header";
 const ENDPOINT_NAMESPACED_DATA: &str = "namespaced_data";
@@ -29,6 +30,12 @@ pub struct Context {
 pub struct BalanceResponse {
     denom: String,
     amount: u32,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct DataAvailableResponse {
+    available: bool,
+    probability_of_availability: String,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -93,6 +100,20 @@ impl Context {
             None => ENDPOINT_BALANCE.to_string(),
         };
         let response = self.call(url).await?;
+        Ok(response)
+    }
+
+    /// Call the `ENDPOINT_DATA_AVAILABLE` endpoint.
+    ///
+    /// Reference: <https://docs.celestia.org/developers/node-tutorial#get-block-header>
+    ///
+    /// # Arguments
+    ///
+    /// * `height` - Block height to check availability for. Must be > 0.
+    pub async fn data_available(&self, height: u64) -> Result<DataAvailableResponse, Error> {
+        let response = self
+            .call(format!("{}/{}", ENDPOINT_DATA_AVAILABLE, height))
+            .await?;
         Ok(response)
     }
 
@@ -187,6 +208,16 @@ mod tests {
         let context = Context::new(DEFAULT_BASE_URL);
         let balance_response = context.balance(Some("0".to_string())).await.unwrap();
         println!("{} response: {:?}", ENDPOINT_BALANCE, balance_response);
+    }
+
+    #[tokio::test]
+    async fn data_available() {
+        let context = Context::new(DEFAULT_BASE_URL);
+        let data_available_response = context.data_available(1).await.unwrap();
+        println!(
+            "{} response: {:?}",
+            ENDPOINT_DATA_AVAILABLE, data_available_response
+        );
     }
 
     #[tokio::test]
