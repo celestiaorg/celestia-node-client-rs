@@ -12,6 +12,7 @@ pub use types::*;
 pub const DEFAULT_BASE_URL: &str = "http://localhost:26658";
 
 const ENDPOINT_BALANCE: &str = "balance";
+const ENDPOINT_HEAD: &str = "head";
 const ENDPOINT_HEADER: &str = "header";
 const ENDPOINT_NAMESPACED_DATA: &str = "namespaced_data";
 const ENDPOINT_NAMESPACED_SHARES: &str = "namespaced_shares";
@@ -27,7 +28,15 @@ pub struct Context {
 #[derive(Debug, Deserialize, Serialize)]
 pub struct BalanceResponse {
     denom: String,
-    amount: u64,
+    amount: u32,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct HeadResponse {
+    header: Header,
+    commit: Commit,
+    validator_set: ValidatorSet,
+    dah: DataAvailabilityHeader,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -66,8 +75,26 @@ impl Context {
     /// Call the `ENDPOINT_BALANCE` endpoint.
     ///
     /// Reference: <https://docs.celestia.org/developers/node-tutorial#balance>
-    pub async fn balance(&self) -> Result<BalanceResponse, Error> {
-        let response = self.call(ENDPOINT_BALANCE.to_string()).await?;
+    ///
+    /// # Arguments
+    ///
+    /// * `address` - Address to fetch for. If `None`, fetch from default address.
+    pub async fn balance(&self, address: Option<String>) -> Result<BalanceResponse, Error> {
+        let url = match address {
+            Some(address) => {
+                format!("{}/{}", ENDPOINT_BALANCE, address)
+            }
+            None => {
+                format!("{}", ENDPOINT_BALANCE)
+            }
+        };
+        let response = self.call(url).await?;
+        Ok(response)
+    }
+
+    /// Call the `ENDPOINT_HEAD` endpoint.
+    pub async fn head(&self) -> Result<HeadResponse, Error> {
+        let response = self.call(format!("{}", ENDPOINT_HEAD)).await?;
         Ok(response)
     }
 
@@ -87,21 +114,53 @@ impl Context {
     ///
     /// # Arguments
     ///
-    /// * `height` - Block height to fetch data for. Must be > 0.
+    /// * `namespace_id` - Namespace ID of the data to fetch.
+    /// * `height` - Block height from which to fetch. If `None`, fetch from
+    /// latest block.
     pub async fn namespaced_data(
         &self,
+        namespace_id: String,
         height: Option<u64>,
     ) -> Result<NamespacedDataResponse, Error> {
-        let response = match height {
+        let url = match height {
             Some(height) => {
-                self.call(format!(
-                    "{}/{}/{}",
-                    ENDPOINT_NAMESPACED_DATA, KEY_HEIGHT, height
-                ))
-                .await?
+                format!(
+                    "{}/{}/{}/{}",
+                    ENDPOINT_NAMESPACED_DATA, namespace_id, KEY_HEIGHT, height
+                )
             }
-            None => self.call(ENDPOINT_NAMESPACED_DATA.to_string()).await?,
+            None => {
+                format!("{}/{}", ENDPOINT_NAMESPACED_DATA, namespace_id)
+            }
         };
+        let response = self.call(url).await?;
+        Ok(response)
+    }
+
+    /// Call the `ENDPOINT_NAMESPACED_SHARES` endpoint.
+    ///
+    /// # Arguments
+    ///
+    /// * `namespace_id` - Namespace ID of the data to fetch.
+    /// * `height` - Block height from which to fetch. If `None`, fetch from
+    /// latest block.
+    pub async fn namespaced_shares(
+        &self,
+        namespace_id: String,
+        height: Option<u64>,
+    ) -> Result<NamespacedSharesResponse, Error> {
+        let url = match height {
+            Some(height) => {
+                format!(
+                    "{}/{}/{}/{}",
+                    ENDPOINT_NAMESPACED_SHARES, namespace_id, KEY_HEIGHT, height
+                )
+            }
+            None => {
+                format!("{}/{}", ENDPOINT_NAMESPACED_SHARES, namespace_id)
+            }
+        };
+        let response = self.call(url).await?;
         Ok(response)
     }
 }
@@ -113,10 +172,24 @@ mod tests {
     use super::*;
 
     #[tokio::test]
-    async fn balance() {
+    async fn balance_none() {
         let context = Context::new(DEFAULT_BASE_URL);
-        let balance_response = context.balance().await.unwrap();
+        let balance_response = context.balance(None).await.unwrap();
         println!("{} response: {:?}", ENDPOINT_BALANCE, balance_response);
+    }
+
+    #[tokio::test]
+    async fn balance_some() {
+        let context = Context::new(DEFAULT_BASE_URL);
+        let balance_response = context.balance(Some("0".to_string())).await.unwrap();
+        println!("{} response: {:?}", ENDPOINT_BALANCE, balance_response);
+    }
+
+    #[tokio::test]
+    async fn head() {
+        let context = Context::new(DEFAULT_BASE_URL);
+        let head_response = context.head().await.unwrap();
+        println!("{} response: {:?}", ENDPOINT_HEAD, head_response);
     }
 
     #[tokio::test]
@@ -124,5 +197,57 @@ mod tests {
         let context = Context::new(DEFAULT_BASE_URL);
         let header_response = context.header(1).await.unwrap();
         println!("{} response: {:?}", ENDPOINT_HEADER, header_response);
+    }
+
+    #[tokio::test]
+    async fn namespaced_data_none() {
+        let context = Context::new(DEFAULT_BASE_URL);
+        let namespaced_data_response = context
+            .namespaced_data("0123456789abcdef".to_string(), None)
+            .await
+            .unwrap();
+        println!(
+            "{} response: {:?}",
+            ENDPOINT_NAMESPACED_DATA, namespaced_data_response
+        );
+    }
+
+    #[tokio::test]
+    async fn namespaced_data_some() {
+        let context = Context::new(DEFAULT_BASE_URL);
+        let namespaced_data_response = context
+            .namespaced_data("0123456789abcdef".to_string(), Some(1))
+            .await
+            .unwrap();
+        println!(
+            "{} response: {:?}",
+            ENDPOINT_NAMESPACED_DATA, namespaced_data_response
+        );
+    }
+
+    #[tokio::test]
+    async fn namespaced_shares_none() {
+        let context = Context::new(DEFAULT_BASE_URL);
+        let namespaced_shares_response = context
+            .namespaced_shares("0123456789abcdef".to_string(), None)
+            .await
+            .unwrap();
+        println!(
+            "{} response: {:?}",
+            ENDPOINT_NAMESPACED_DATA, namespaced_shares_response
+        );
+    }
+
+    #[tokio::test]
+    async fn namespaced_shares_some() {
+        let context = Context::new(DEFAULT_BASE_URL);
+        let namespaced_shares_response = context
+            .namespaced_shares("0123456789abcdef".to_string(), Some(1))
+            .await
+            .unwrap();
+        println!(
+            "{} response: {:?}",
+            ENDPOINT_NAMESPACED_DATA, namespaced_shares_response
+        );
     }
 }
