@@ -5,7 +5,7 @@ authors = ["John Adler <john@celestia.org>"]
 edition = "2021"
 homepage = "https://celestia.org"
 license = "Apache-2.0"
-repository = "https://github.com/adlerjohn/celestia-node-client-rs"
+repository = "https://github.com/celestiaorg/celestia-node-client-rs"
 description = "🦀 celestia-node REST client in Rust."
 
 [dependencies]
