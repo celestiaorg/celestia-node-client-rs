@@ -199,90 +199,75 @@ mod tests {
     #[tokio::test]
     async fn balance_none() {
         let context = Context::new(DEFAULT_BASE_URL);
-        let balance_response = context.balance(None).await.unwrap();
-        println!("{} response: {:?}", ENDPOINT_BALANCE, balance_response);
+        let response = context.balance(None).await.unwrap();
+        println!("{} response: {:?}", ENDPOINT_BALANCE, response);
     }
 
     #[tokio::test]
     async fn balance_some() {
         let context = Context::new(DEFAULT_BASE_URL);
-        let balance_response = context.balance(Some("0".to_string())).await.unwrap();
-        println!("{} response: {:?}", ENDPOINT_BALANCE, balance_response);
+        let response = context.balance(Some("0".to_string())).await.unwrap();
+        println!("{} response: {:?}", ENDPOINT_BALANCE, response);
     }
 
     #[tokio::test]
     async fn data_available() {
         let context = Context::new(DEFAULT_BASE_URL);
-        let data_available_response = context.data_available(1).await.unwrap();
-        println!(
-            "{} response: {:?}",
-            ENDPOINT_DATA_AVAILABLE, data_available_response
-        );
+        let response = context.data_available(1).await.unwrap();
+        println!("{} response: {:?}", ENDPOINT_DATA_AVAILABLE, response);
     }
 
     #[tokio::test]
     async fn head() {
         let context = Context::new(DEFAULT_BASE_URL);
-        let head_response = context.head().await.unwrap();
-        println!("{} response: {:?}", ENDPOINT_HEAD, head_response);
+        let response = context.head().await.unwrap();
+        println!("{} response: {:?}", ENDPOINT_HEAD, response);
     }
 
     #[tokio::test]
     async fn header() {
         let context = Context::new(DEFAULT_BASE_URL);
-        let header_response = context.header(1).await.unwrap();
-        println!("{} response: {:?}", ENDPOINT_HEADER, header_response);
+        let response = context.header(1).await.unwrap();
+        println!("{} response: {:?}", ENDPOINT_HEADER, response);
     }
 
     #[tokio::test]
     async fn namespaced_data_none() {
         let context = Context::new(DEFAULT_BASE_URL);
-        let namespaced_data_response = context
+        let response = context
             .namespaced_data("0123456789abcdef".to_string(), None)
             .await
             .unwrap();
-        println!(
-            "{} response: {:?}",
-            ENDPOINT_NAMESPACED_DATA, namespaced_data_response
-        );
+        println!("{} response: {:?}", ENDPOINT_NAMESPACED_DATA, response);
     }
 
     #[tokio::test]
     async fn namespaced_data_some() {
         let context = Context::new(DEFAULT_BASE_URL);
-        let namespaced_data_response = context
+        let response = context
             .namespaced_data("0123456789abcdef".to_string(), Some(1))
             .await
             .unwrap();
-        println!(
-            "{} response: {:?}",
-            ENDPOINT_NAMESPACED_DATA, namespaced_data_response
-        );
+        println!("{} response: {:?}", ENDPOINT_NAMESPACED_DATA, response);
     }
 
     #[tokio::test]
     async fn namespaced_shares_none() {
         let context = Context::new(DEFAULT_BASE_URL);
-        let namespaced_shares_response = context
+        let response = context
             .namespaced_shares("0123456789abcdef".to_string(), None)
             .await
             .unwrap();
-        println!(
-            "{} response: {:?}",
-            ENDPOINT_NAMESPACED_DATA, namespaced_shares_response
-        );
+        println!("{} response: {:?}", ENDPOINT_NAMESPACED_DATA, response);
     }
 
     #[tokio::test]
     async fn namespaced_shares_some() {
         let context = Context::new(DEFAULT_BASE_URL);
-        let namespaced_shares_response = context
+        let response = context
             .namespaced_shares("0123456789abcdef".to_string(), Some(1))
             .await
             .unwrap();
-        println!(
-            "{} response: {:?}",
-            ENDPOINT_NAMESPACED_DATA, namespaced_shares_response
-        );
+        println!("{} response: {:?}", ENDPOINT_NAMESPACED_DATA, response);
     }
 }
