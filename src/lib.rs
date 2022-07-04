@@ -33,6 +33,9 @@ pub struct BalanceResponse {
 #[derive(Debug, Deserialize, Serialize)]
 pub struct HeaderResponse {
     header: Header,
+    commit: Commit,
+    validator_set: ValidatorSet,
+    dah: DataAvailabilityHeader,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -113,13 +116,13 @@ mod tests {
     async fn balance() {
         let context = Context::new(DEFAULT_BASE_URL);
         let balance_response = context.balance().await.unwrap();
-        print!("{} response: {:?}", ENDPOINT_BALANCE, balance_response);
+        println!("{} response: {:?}", ENDPOINT_BALANCE, balance_response);
     }
 
     #[tokio::test]
     async fn header() {
         let context = Context::new(DEFAULT_BASE_URL);
         let header_response = context.header(1).await.unwrap();
-        print!("{} response: {:?}", ENDPOINT_HEADER, header_response);
+        println!("{} response: {:?}", ENDPOINT_HEADER, header_response);
     }
 }
