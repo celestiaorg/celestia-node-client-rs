@@ -85,7 +85,7 @@ impl Context {
                 format!("{}/{}", ENDPOINT_BALANCE, address)
             }
             None => {
-                format!("{}", ENDPOINT_BALANCE)
+                format!("{}", ENDPOINT_BALANCE.to_string())
             }
         };
         let response = self.call(url).await?;
@@ -94,7 +94,7 @@ impl Context {
 
     /// Call the `ENDPOINT_HEAD` endpoint.
     pub async fn head(&self) -> Result<HeadResponse, Error> {
-        let response = self.call(format!("{}", ENDPOINT_HEAD)).await?;
+        let response = self.call(format!("{}", ENDPOINT_HEAD.to_string())).await?;
         Ok(response)
     }
 
